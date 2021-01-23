@@ -76,28 +76,34 @@ const AllData = ({
     fetchEstados();
   }, []);
 
+  // console.log("Zonas-Entrega:", entrega.entrega);
+  // console.log("Zonas-Entrega:", entrega.entrega.length);
+  // console.log("busqueda:", busqueda.busqueda.length);
+
   useEffect(() => {
     if (loading1 && loading2 && loading3 && loading4) {
-      entrega.entrega.map((e) => {
-        let newbusqueda = busqueda.busqueda;
+      if (entrega.entrega.length > 0) {
+        entrega.entrega.map((e) => {
+          let newbusqueda = busqueda.busqueda;
 
-        newbusqueda = newbusqueda.filter(
-          (b) => b.asignacion_id != e.idAsignacion
-        );
-
-        let newasignaciones = asignaciones.asignaciones;
-
-        newasignaciones = newasignaciones.map((z) => {
-          let newzonaasignaciones = z.asignaciones;
-          newzonaasignaciones = newzonaasignaciones.filter(
+          newbusqueda = newbusqueda.filter(
             (b) => b.asignacion_id != e.idAsignacion
           );
-          return { ...z, asignaciones: newzonaasignaciones };
-        });
 
-        dispatch(actions.actualizarAsignaciones([...newasignaciones]));
-        dispatch(actions.actualizarBusqueda([...newbusqueda]));
-      });
+          let newasignaciones = asignaciones.asignaciones;
+
+          newasignaciones = newasignaciones.map((z) => {
+            let newzonaasignaciones = z.asignaciones;
+            newzonaasignaciones = newzonaasignaciones.filter(
+              (b) => b.asignacion_id != e.idAsignacion
+            );
+            return { ...z, asignaciones: newzonaasignaciones };
+          });
+
+          dispatch(actions.actualizarAsignaciones([...newasignaciones]));
+          dispatch(actions.actualizarBusqueda([...newbusqueda]));
+        });
+      }
 
       setLoading(true);
       navigation.navigate("Zonas");

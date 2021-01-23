@@ -35,25 +35,38 @@ class Zonas extends Component {
   dispatch = this.props.dispatch;
 
   sincronizarData = () => {
-    this.props.entrega.entrega.map((e, index) => {
-      let formData = this.createFormData(e);
-      let isthend = this.props.entrega.entrega.length == index + 1;
-      this.sendFetch(formData, isthend);
+    this.setState({
+      isLoading: true,
+    });
 
-      isthend && this.props.dispatch(actions.actualizarEntrega([]));
-      isthend && this.props.navigation.push("AllData");
+    if (this.props.entrega.entrega.length == 0) {
+      this.setState({ isLoading: false });
+      alert("Realice una entrega");
+    }
+
+    this.props.entrega.entrega.map(async (e, index) => {
+      let formData = await this.createFormData(e);
+      // console.log("entrega:", e);
+      let isthend = this.props.entrega.entrega.length == index + 1;
+      let result = await this.sendFetch(formData, isthend);
+      // console.log("isthend:", isthend);
+
+      result && isthend && this.props.dispatch(actions.actualizarEntrega([]));
+      result && isthend && this.props.navigation.push("AllData");
+      isthend && this.setState({ isLoading: false });
     });
   };
 
-  createFormData = (objeto) => {
+  createFormData = async (objeto) => {
     const formData = new FormData();
 
     //ad to data
-    objeto.LocalImage.forEach((item, i) => {
+    await objeto.LocalImage.map(async (item, i) => {
+      console.log("OBJETO:", objeto.LocalImage);
       formData.append("userfile[]", {
         uri: item,
         type: "image/jpeg",
-        name: item.filename || `filename${i}.jpg`,
+        name: item.split("/").pop(),
       });
     });
     // formData.append("userfile[]", images);
@@ -66,8 +79,8 @@ class Zonas extends Component {
     return formData;
   };
 
-  sendFetch = (formData, isthend = false) => {
-    fetch("https://nelbermec.com/api/registrarEntrega", {
+  sendFetch = async (formData, isthend = false) => {
+    return await fetch("https://nelbermec.com/api/registrarEntrega", {
       method: "POST",
       headers: {
         Accept: "application/json",
@@ -87,6 +100,7 @@ class Zonas extends Component {
         //   isLoading: false,
         // });
         // console.log("reponse:", responseJson);
+        return true;
       })
       .catch((err) => {
         alert(err);
@@ -94,6 +108,7 @@ class Zonas extends Component {
         // this.setState({
         //   isLoading: false,
         // });
+        return false;
       });
   };
 
@@ -126,7 +141,7 @@ class Zonas extends Component {
   }
 
   handleZonas = (id) => {
-    this.props.navigation.navigate("Asignaciones", {
+    this.props.navigation.push("Asignaciones", {
       id,
     });
   };
@@ -135,7 +150,8 @@ class Zonas extends Component {
     let asig = this.props.asignaciones.asignaciones.find(
       (a) => a.zona_id == item.zona_id
     );
-    console.log(asig.asignaciones.length);
+    // console.log(asig.asignaciones.length);
+    console.log("ENTREGA:", this.props.entrega.entrega);
 
     return (
       <TouchableOpacity onPress={() => this.handleZonas(item.zona_id)}>

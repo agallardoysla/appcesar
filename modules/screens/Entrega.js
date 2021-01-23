@@ -215,7 +215,7 @@ class Evidencias extends React.Component {
       idAsignacion: enlace,
     });
 
-    console.log("entrega:", entrega);
+    // console.log("entrega:", entrega);
   };
 
   // lista de estados
@@ -236,7 +236,7 @@ class Evidencias extends React.Component {
     this.setState({
       dataEstados: estado,
     });
-    console.log("estado:", estado);
+    // console.log("estado:", estado);
   };
 
   // enviar al servidor
@@ -265,6 +265,7 @@ class Evidencias extends React.Component {
             comentario: this.state.comentario,
           },
         ])
+        // actions.actualizarEntrega([])
       );
 
       let newbusqueda = this.props.busqueda.busqueda;
@@ -288,58 +289,6 @@ class Evidencias extends React.Component {
 
       this.props.navigation.push("Zonas");
     }
-  };
-
-  createFormData = (objeto) => {
-    const formData = new FormData();
-
-    //ad to data
-    objeto.LocalImage.forEach((item, i) => {
-      formData.append("userfile[]", {
-        uri: item,
-        type: "image/jpeg",
-        name: item.filename || `filename${i}.jpg`,
-      });
-    });
-    // formData.append("userfile[]", images);
-    formData.append("estado", objeto.estado);
-    formData.append("latitude", objeto.latitude);
-    formData.append("longitude", objeto.longitude);
-    formData.append("idAsignacion", objeto.idAsignacion);
-    formData.append("comentario", objeto.comentario);
-
-    return formData;
-  };
-
-  sendFetch = async (formData) => {
-    await fetch("https://nelbermec.com/api/registrarEntrega", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "multipart/form-data",
-      },
-      body: formData,
-    })
-      .then((response) => response.json())
-      .then((responseJson) => {
-        if (responseJson.result == true) {
-          alert(responseJson.message);
-          // console.log(responseJson);
-        } else {
-          alert(responseJson.message);
-        }
-        // this.setState({
-        //   isLoading: false,
-        // });
-        // console.log("reponse:", responseJson);
-      })
-      .catch((err) => {
-        alert(err);
-        // console.log(err);
-        // this.setState({
-        //   isLoading: false,
-        // });
-      });
   };
 
   _maybeRenderImage = () => {
@@ -370,7 +319,7 @@ class Evidencias extends React.Component {
             borderRadius: 6,
             borderColor: "#ed6d2d",
             borderWidth: 1,
-            borderStyle: "solid",
+            // borderStyle: "solid",
             width: 150,
             height: 150,
           }}
@@ -383,6 +332,7 @@ class Evidencias extends React.Component {
   render() {
     // console.log("asignaciones", this.props.asignaciones.asignaciones);
     // console.log("busqueda", this.props.busqueda.busqueda);
+    console.log("Entrega:", this.props.entrega);
 
     const { nombre, cedula, factura, cajas, telefono } = this.state;
     if (this.state.isLoading) {
