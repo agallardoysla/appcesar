@@ -10,20 +10,20 @@ import {
   TouchableOpacity,
   StatusBar,
   AsyncStorage,
-  Image
+  Image,
 } from "react-native";
+import { connect } from "react-redux";
 
-class Asignaciones extends Component{
-
+class Asignaciones extends Component {
   static navigationOptions = {
-    title: 'Entregas pendientes',
+    title: "Entregas pendientes",
   };
 
   state = {
     isLoading: true,
     dataSource: [],
-    usuario : 0,
-    pendientes:0
+    usuario: 0,
+    pendientes: 0,
   };
 
   // async getToken(user) {
@@ -37,116 +37,134 @@ class Asignaciones extends Component{
   //   }
   // }
 
-
   async componentDidMount() {
-    
     let userData = await AsyncStorage.getItem("userData");
     let data = JSON.parse(userData);
     this.setState({
-      usuario:data,
+      usuario: data,
     });
-    this.fetchEntregas();
+    // this.fetchEntregas();
+    this.entregasPendientes();
   }
 
-  fetchEntregas = () => {
+  // fetchEntregas = () => {
+  //   const { navigation } = this.props;
+  //   const zona = navigation.getParam("id");
+  //   const usuario = this.state.usuario;
+  //   console.log("usuario:", usuario);
+  //   console.log("zona:", zona);
+  //   fetch(`https://nelbermec.com/api/asignacionesPorZonas/${zona}/${usuario}`)
+  //     .then((response) => response.json())
+  //     .then((responseJson) => {
+  //       this.setState({
+  //         isLoading: false,
+  //         dataSource: responseJson,
+  //         pendientes: responseJson.length,
+  //       });
+  //       // console.log("responseJson:", responseJson);
+  //       // console.log("responseJson.length:", responseJson.length);
+  //     });
+  // };
+
+  entregasPendientes = () => {
     const { navigation } = this.props;
-    const zona = navigation.getParam('id');
-    const usuario = this.state.usuario
-    console.log(usuario);
-    console.log(zona);
-    fetch(`https://nelbermec.com/api/asignacionesPorZonas/${zona}/${usuario}`)
-      .then(response => response.json())
-      .then(responseJson => {
-        this.setState({
-          isLoading: false,
-          dataSource: responseJson,
-          pendientes: responseJson.length,
-        });
-        console.log(responseJson);
+    const zona = navigation.getParam("id");
+    const { asignaciones } = this.props.asignaciones;
+    if (asignaciones.length) {
+      const pendientes = asignaciones.find((item) => item.zona_id === zona);
+      this.setState({
+        isLoading: false,
+        dataSource: pendientes.asignaciones,
+        pendientes: pendientes.asignaciones.length,
       });
+    }
   };
 
-  handleAsignaciones = id => {
-    this.props.navigation.navigate('Entrega', {
+  handleAsignaciones = (id) => {
+    this.props.navigation.navigate("Entrega", {
       id,
     });
   };
 
-
   renderZona = ({ item }) => (
-      <TouchableOpacity onPress={() => this.handleAsignaciones(item.asignacion_id)}>
-        <View style={styles.mainCardView}>
-          <View style={{flexDirection: 'row', alignItems: 'center'}}>
-            <View style={styles.subCardView}>
-              <Image
-                source={require("../assets/icons/man.png")}
-                resizeMode="cover"
-                style={{
-                  borderRadius: 25,
-                  height: 50,
-                  width: 50,
-                }}
-              />
-            </View>
-            <View style={{flex: 0.9, marginLeft: 12}}>
+    <TouchableOpacity
+      onPress={() => this.handleAsignaciones(item.asignacion_id)}
+    >
+      <View style={styles.mainCardView}>
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View style={styles.subCardView}>
+            <Image
+              source={require("../assets/icons/man.png")}
+              resizeMode="cover"
+              style={{
+                borderRadius: 25,
+                height: 50,
+                width: 50,
+              }}
+            />
+          </View>
+          <View style={{ flex: 0.9, marginLeft: 12 }}>
+            <Text
+              style={{
+                fontSize: 18,
+                color: "#131313",
+                fontWeight: "bold",
+                //fontFamily: Fonts.nunitoBold,
+                textTransform: "capitalize",
+                flexShrink: 1,
+              }}
+            >
+              {item.cliente_razon_social.replace(/\s\s+/g, " ")}
+            </Text>
+            <View
+              style={{
+                marginTop: 4,
+                borderWidth: 0,
+                width: "85%",
+              }}
+            >
               <Text
                 style={{
-                  fontSize: 18,
-                  color: '#131313',
-                  fontWeight: 'bold',
-                  //fontFamily: Fonts.nunitoBold,
-                  textTransform: 'capitalize',
-                  flexShrink:1,
-                }}>
-                {item.cliente_razon_social.replace(/\s\s+/g, ' ')}
+                  color: "#666464",
+                  fontSize: 12,
+                }}
+              >
+                {item.cliente_direccion}
               </Text>
-              <View
+              <Text
                 style={{
-                  marginTop: 4,
-                  borderWidth: 0,
-                  width: '85%',
-                }}>
-                <Text
-                  style={{
-                    color: '#666464',
-                    fontSize: 12,
-                  }}>
-                  {item.cliente_direccion}
-                </Text>
-                <Text
-                  style={{
-                    color: '#666464',
-                    fontSize: 12,
-                    fontWeight: "bold"
-                  }}>
-                  {'Factura: '+item.matriz_codigo_factura}
-                </Text>
-              </View>
+                  color: "#666464",
+                  fontSize: 12,
+                  fontWeight: "bold",
+                }}
+              >
+                {"Factura: " + item.matriz_codigo_factura}
+              </Text>
             </View>
           </View>
-          <View
-            style={{
-              height: 35,
-              backgroundColor: '#09CC47',
-              borderWidth: 0,
-              width: 35,
-              marginLeft: -5,
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 70,
-            }}>
-            <Text style={{color: '#fff', fontSize:16}}>
-              {'+'}
-            </Text>
-          </View>
         </View>
-      </TouchableOpacity>
+        <View
+          style={{
+            height: 35,
+            backgroundColor: "#09CC47",
+            borderWidth: 0,
+            width: 35,
+            marginLeft: -5,
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: 70,
+          }}
+        >
+          <Text style={{ color: "#fff", fontSize: 16 }}>{"+"}</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
   );
 
-  keyExtractor = item => item.asignacion_id;
+  keyExtractor = (item) => item.asignacion_id;
 
   render() {
-    const { dataSource , isLoading, pendientes } = this.state;
+    const { dataSource, isLoading, pendientes } = this.state;
     if (this.state.isLoading) {
       return (
         <View style={[styles.container, styles.horizontal]}>
@@ -157,17 +175,17 @@ class Asignaciones extends Component{
 
     return (
       <SafeAreaView style={styles.container}>
-          <Text style={styles.cardTitle}>
-              Pendientes por entregar {pendientes}
-          </Text>
-          <ScrollView>
-            <FlatList
-              data={dataSource}
-              renderItem={this.renderZona}
-              keyExtractor={this.keyExtractor}
-            />
-          </ScrollView>
-        </SafeAreaView>
+        <Text style={styles.cardTitle}>
+          Pendientes por entregar {pendientes}
+        </Text>
+        <ScrollView>
+          <FlatList
+            data={dataSource}
+            renderItem={this.renderZona}
+            keyExtractor={this.keyExtractor}
+          />
+        </ScrollView>
+      </SafeAreaView>
     );
   }
 }
@@ -176,22 +194,21 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     //marginTop: StatusBar.currentHeight || 0,
-    backgroundColor: "#ed6d2d"
-
+    backgroundColor: "#ed6d2d",
   },
   mainCardView: {
     height: 130,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#fff',
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#fff",
     borderRadius: 15,
-    shadowColor: '#2C2B2B',
-    shadowOffset: {width: 0, height: 0},
+    shadowColor: "#2C2B2B",
+    shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 1,
     shadowRadius: 8,
     elevation: 8,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingLeft: 16,
     paddingRight: 14,
     marginTop: 6,
@@ -201,26 +218,32 @@ const styles = StyleSheet.create({
   },
 
   cardTitle: {
-    flexWrap: 'wrap',
-    textAlign: 'center',
-    textAlignVertical: 'center',
+    flexWrap: "wrap",
+    textAlign: "center",
+    textAlignVertical: "center",
     color: "#fff",
     fontSize: 18,
-    padding:10,
-    backgroundColor: '#38403B',
-    borderRadius:10,
-    color: 'white',
-    marginTop:10,
-    marginLeft:16,
-    marginRight:16,
-    marginBottom:3,
+    padding: 10,
+    backgroundColor: "#38403B",
+    borderRadius: 10,
+    color: "white",
+    marginTop: 10,
+    marginLeft: 16,
+    marginRight: 16,
+    marginBottom: 3,
   },
 
   horizontal: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
+    flexDirection: "row",
+    justifyContent: "space-around",
     padding: 10,
   },
 });
 
-export default Asignaciones;
+// export default Asignaciones;
+const mapStateToProps = ({ asignaciones, entrega }) => ({
+  asignaciones,
+  entrega,
+});
+
+export default connect(mapStateToProps)(Asignaciones);

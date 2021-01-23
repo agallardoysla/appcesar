@@ -1,6 +1,6 @@
-import * as Font from 'expo-font';
-import AppLoading from 'expo-app-loading';
-import { Asset } from 'expo-asset';
+import * as Font from "expo-font";
+import AppLoading from "expo-app-loading";
+import { Asset } from "expo-asset";
 import React, { Component } from "react";
 import { StyleProvider } from "native-base";
 
@@ -12,7 +12,7 @@ export default class Setup extends Component {
   constructor() {
     super();
     this.state = {
-      isReady: false
+      isReady: false,
     };
   }
   componentDidMount() {
@@ -22,8 +22,7 @@ export default class Setup extends Component {
     await Font.loadAsync({
       Roboto: require("native-base/Fonts/Roboto.ttf"),
       Roboto_medium: require("native-base/Fonts/Roboto_medium.ttf"),
-      'Roboto': require('../assets/fonts/roboto-regular.ttf'),
-
+      Roboto: require("../assets/fonts/roboto-regular.ttf"),
     });
     this.setState({ isReady: true });
   }
@@ -36,22 +35,22 @@ export default class Setup extends Component {
           onFinish={() => this.setState({ isReady: true })}
           onError={console.warn}
         />
-      ); }
-
-      return (
-        <StyleProvider style={getTheme(variables)}>
-          <App />
-        </StyleProvider>
       );
+    }
+
+    return (
+      <StyleProvider style={getTheme(variables)}>
+        <App />
+      </StyleProvider>
+    );
   }
 
   async _cacheResourcesAsync() {
-    const images = [require('../../assets/icon.png')];
+    const images = [require("../../assets/icon.png")];
 
-    const cacheImages = images.map(image => {
+    const cacheImages = images.map((image) => {
       return Asset.fromModule(image).downloadAsync();
-    }); 
+    });
     return Promise.all(cacheImages);
   }
-
 }
